@@ -1,5 +1,7 @@
-# A list of standard prefixes or patterns that represent low-signal noise
-NOISE_PREFIXES = [
+from typing import List
+
+# Default list of noise prefixes
+DEFAULT_NOISE_PREFIXES = [
     "INFO  ", 
     "DEBUG ", 
     "TRACE ", 
@@ -10,11 +12,13 @@ NOISE_PREFIXES = [
     "extracting"
 ]
 
-def remove_noise(lines: list[str]) -> list[str]:
+def remove_noise(lines: List[str], custom_patterns: List[str] = None) -> List[str]:
     """
-    Strips universally useless lines (e.g., empty whitespace, info logs, generic progress indicators).
+    Strips universally useless lines, plus any custom noise patterns provided.
     """
+    patterns = custom_patterns if custom_patterns is not None else DEFAULT_NOISE_PREFIXES
     out = []
+    
     for line in lines:
         stripped = line.strip()
         if not stripped:
@@ -23,8 +27,9 @@ def remove_noise(lines: list[str]) -> list[str]:
         is_noise = False
         lower_line = stripped.lower()
         
-        for prefix in NOISE_PREFIXES:
-            if lower_line.startswith(prefix.lower()):
+        for pattern in patterns:
+            # Simple substring match for flexibility
+            if pattern.lower() in lower_line:
                 is_noise = True
                 break
                 

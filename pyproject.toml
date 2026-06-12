@@ -12,6 +12,7 @@ dependencies = [
     "pydantic-settings",
     "httpx",
     "tiktoken",
+    "pyyaml",
 ]
 
 [project.optional-dependencies]

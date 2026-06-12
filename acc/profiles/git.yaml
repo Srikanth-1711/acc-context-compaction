@@ -1,0 +1,9 @@
+name: git
+max_lines: 1000
+head_ratio: 0.1
+noise_patterns:
+  - "index "
+  - "--- a/"
+  - "+++ b/"
+important_patterns:
+  - "diff --git"
