@@ -1,0 +1,5 @@
+name: json_data
+type: json
+max_lines: 2000
+head_ratio: 0.5
+noise_patterns: []

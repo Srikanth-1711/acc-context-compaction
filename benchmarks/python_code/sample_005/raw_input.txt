@@ -1,0 +1,12 @@
+def process_data_5(x):
+    """
+    This is a long docstring for process_data_5.
+    It explains many things.
+    """
+    y = x + 1
+    z = y * 2
+    return z
+
+class DataManager_5:
+    def __init__(self):
+        self.data = []

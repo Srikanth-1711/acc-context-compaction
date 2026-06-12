@@ -1,0 +1,9 @@
+{
+  "errors": [],
+  "warnings": [],
+  "critical_files": [
+    "def process_data_6(x):",
+    "class DataManager_6:"
+  ],
+  "decisions": []
+}

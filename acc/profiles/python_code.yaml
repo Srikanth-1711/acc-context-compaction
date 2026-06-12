@@ -1,0 +1,5 @@
+name: python_code
+type: python
+max_lines: 5000
+head_ratio: 0.1
+noise_patterns: []

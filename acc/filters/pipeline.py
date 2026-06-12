@@ -3,6 +3,8 @@ from acc.filters.strip_ansi import strip_ansi
 from acc.filters.dedup import dedup
 from acc.filters.noise import remove_noise
 from acc.filters.head_tail import head_tail
+from acc.structured.python_ast import compress_python
+from acc.structured.json_minifier import compress_json
 
 class FilterPipeline:
     def __init__(self, profile: Dict[str, Any] = None):
@@ -11,6 +13,14 @@ class FilterPipeline:
     def execute(self, text: str) -> str:
         if not text:
             return ""
+            
+        profile_type = self.profile.get("type", "text")
+        
+        # If language-aware, do structured compression first
+        if profile_type == "python":
+            text = compress_python(text)
+        elif profile_type == "json":
+            text = compress_json(text, max_depth=2)
             
         lines = text.split("\n")
         

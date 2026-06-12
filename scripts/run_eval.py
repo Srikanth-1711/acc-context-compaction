@@ -8,7 +8,7 @@ if __name__ == "__main__":
     
     print("=== ACC Quality Score Evaluation (Phase 3 Profiles) ===")
     
-    categories = ["pytest", "git", "docker", "kubectl", "conversations", "repositories"]
+    categories = ["pytest", "git", "docker", "kubectl", "conversations", "repositories", "python_code", "json_data"]
     for cat in categories:
         profile = pm.load_profile(cat)
         pipeline = FilterPipeline(profile)

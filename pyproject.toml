@@ -13,6 +13,7 @@ dependencies = [
     "httpx",
     "tiktoken",
     "pyyaml",
+    "astor",
 ]
 
 [project.optional-dependencies]

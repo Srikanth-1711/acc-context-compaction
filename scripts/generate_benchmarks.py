@@ -8,7 +8,9 @@ CATEGORIES = {
     "docker": 20,
     "kubectl": 20,
     "conversations": 20,
-    "repositories": 10
+    "repositories": 10,
+    "python_code": 10,
+    "json_data": 10
 }
 
 def create_mock_data(category, index):
@@ -33,6 +35,12 @@ def create_mock_data(category, index):
     elif category == "repositories":
         raw_content = f"Project {index} has 500 files.\nEntry point is src/main.py.\nDependencies are in pyproject.toml.\n"
         expected_signal["critical_files"].extend(["src/main.py", "pyproject.toml"])
+    elif category == "python_code":
+        raw_content = f'def process_data_{index}(x):\n    """\n    This is a long docstring for process_data_{index}.\n    It explains many things.\n    """\n    y = x + 1\n    z = y * 2\n    return z\n\nclass DataManager_{index}:\n    def __init__(self):\n        self.data = []\n'
+        expected_signal["critical_files"].extend([f"def process_data_{index}(x):", f"class DataManager_{index}:"])
+    elif category == "json_data":
+        raw_content = '{\n  "status": "success",\n  "data": {\n    "items": [\n      {"id": 1, "name": "A"},\n      {"id": 2, "name": "B"}\n    ]\n  }\n}'
+        expected_signal["critical_files"].append('"status":"success"')
         
     return raw_content, expected_signal
 
