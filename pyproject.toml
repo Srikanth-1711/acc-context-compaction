@@ -1,0 +1,23 @@
+[project]
+name = "acc"
+version = "0.1.0"
+description = "Automatically Context Compaction framework"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp",
+    "typer",
+    "fastapi",
+    "sqlalchemy",
+    "pydantic-settings",
+    "httpx",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+]
+
+[project.scripts]
+acc-mcp = "acc.mcp.server:main"
+acc-proxy = "acc.compaction.proxy:app"
