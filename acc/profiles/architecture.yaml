@@ -1,0 +1,9 @@
+name: architecture
+type: python
+max_lines: 1000
+head_ratio: 0.5
+noise_patterns:
+  - "import typing"
+  - "from typing import"
+  - "logger.info"
+  - "logger.debug"

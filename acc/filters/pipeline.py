@@ -37,6 +37,18 @@ class FilterPipeline:
         # 4. Head/Tail
         max_lines = self.profile.get("max_lines", 2000)
         head_ratio = self.profile.get("head_ratio", 0.2)
+        pre_ht_len = len(lines)
         lines = head_tail(lines, max_lines=max_lines, head_ratio=head_ratio)
+        
+        if len(lines) < pre_ht_len:
+            import time
+            import os
+            import tempfile
+            ts = int(time.time())
+            tmp_dir = tempfile.gettempdir()
+            log_path = os.path.join(tmp_dir, f"acc_tee_{ts}.log")
+            with open(log_path, "w", encoding="utf-8") as f:
+                f.write(text)
+            lines.append(f"\\n... [Truncated to save tokens. Full raw output saved to {log_path}. Use view_file to read if necessary.]")
             
         return "\n".join(lines)
