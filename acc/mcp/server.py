@@ -4,6 +4,7 @@ from mcp import types as mcp_types
 from .tools_cli import cli_run_tool
 from .tools_memory import memory_save_tool, memory_search_tool
 from .tools_compaction import compress_context_tool
+from .tools_repo import compress_repository_tool
 
 server = Server("acc")
 
@@ -37,6 +38,20 @@ async def cli_run(input: dict) -> list:
 )
 async def compress_context(input: dict) -> list:
     return await compress_context_tool(input)
+
+@server.tool(
+    name="compress_repository",
+    description="Scan a codebase directory, map its architecture, and return a structurally compressed representation",
+    input_schema={
+        "type": "object",
+        "properties": {
+            "directory": {"type": "string", "description": "Absolute or relative path to the repository directory"},
+        },
+        "required": ["directory"],
+    },
+)
+async def compress_repo(input: dict) -> list:
+    return await compress_repository_tool(input)
 
 @server.tool(
     name="memory_save",
