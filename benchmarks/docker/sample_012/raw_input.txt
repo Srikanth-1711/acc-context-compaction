@@ -1,0 +1,4 @@
+Step 1/5 : FROM python:3.9
+Step 2/5 : RUN pip install -r requirements.txt
+WARNING: Running pip as the 'root' user can result in broken permissions.
+Step 3/5 : COPY . .

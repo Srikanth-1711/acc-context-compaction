@@ -1,0 +1,8 @@
+{
+  "errors": [],
+  "warnings": [
+    "Running pip as the 'root' user can result in broken permissions."
+  ],
+  "critical_files": [],
+  "decisions": []
+}

@@ -1,0 +1,8 @@
+============================= test session starts =============================
+platform linux -- Python 3.10
+collected 23 items
+test_18.py F
+
+FAILURES
+> assert 18 == 19
+E AssertionError: assert 18 == 19

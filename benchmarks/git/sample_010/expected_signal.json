@@ -1,0 +1,8 @@
+{
+  "errors": [],
+  "warnings": [],
+  "critical_files": [
+    "file10.py"
+  ],
+  "decisions": []
+}

@@ -1,0 +1,8 @@
+============================= test session starts =============================
+platform linux -- Python 3.10
+collected 12 items
+test_7.py F
+
+FAILURES
+> assert 7 == 8
+E AssertionError: assert 7 == 8

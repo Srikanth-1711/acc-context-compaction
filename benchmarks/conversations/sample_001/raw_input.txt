@@ -1,0 +1,4 @@
+User: Can we use PostgreSQL for this project?
+Agent: Yes, we can. Let's use it.
+User: Actually, let's stick to SQLite for phase 1 to keep it simple.
+Agent: Agreed, SQLite it is.

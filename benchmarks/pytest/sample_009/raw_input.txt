@@ -1,0 +1,8 @@
+============================= test session starts =============================
+platform linux -- Python 3.10
+collected 14 items
+test_9.py F
+
+FAILURES
+> assert 9 == 10
+E AssertionError: assert 9 == 10

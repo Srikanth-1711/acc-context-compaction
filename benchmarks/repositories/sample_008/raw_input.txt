@@ -1,0 +1,3 @@
+Project 8 has 500 files.
+Entry point is src/main.py.
+Dependencies are in pyproject.toml.

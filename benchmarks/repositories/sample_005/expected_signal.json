@@ -1,0 +1,9 @@
+{
+  "errors": [],
+  "warnings": [],
+  "critical_files": [
+    "src/main.py",
+    "pyproject.toml"
+  ],
+  "decisions": []
+}

@@ -1,0 +1,8 @@
+diff --git a/file11.py b/file11.py
+index a..b
+--- a/file11.py
++++ b/file11.py
+@@ -1,3 +1,4 @@
+ def func():
+-    pass
++    return 11

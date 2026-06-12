@@ -1,0 +1,8 @@
+{
+  "errors": [
+    "AssertionError: assert 11 == 12"
+  ],
+  "warnings": [],
+  "critical_files": [],
+  "decisions": []
+}

@@ -1,0 +1,8 @@
+============================= test session starts =============================
+platform linux -- Python 3.10
+collected 6 items
+test_1.py F
+
+FAILURES
+> assert 1 == 2
+E AssertionError: assert 1 == 2
