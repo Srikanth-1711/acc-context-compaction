@@ -3,6 +3,7 @@ from mcp import types as mcp_types
 
 from .tools_cli import cli_run_tool
 from .tools_memory import memory_save_tool, memory_search_tool
+from .tools_compaction import compress_context_tool
 
 server = Server("acc")
 
@@ -19,8 +20,23 @@ server = Server("acc")
         "required": ["cmd"],
     },
 )
-async def cli_run(input: mcp_types.ToolInput) -> mcp_types.ToolResult:
+async def cli_run(input: dict) -> list:
     return await cli_run_tool(input)
+
+@server.tool(
+    name="compress_context",
+    description="Compress raw text or code structurally to save LLM tokens",
+    input_schema={
+        "type": "object",
+        "properties": {
+            "text": {"type": "string"},
+            "profile": {"type": "string", "description": "Optional profile name like 'python_code', 'pytest', 'docker'"},
+        },
+        "required": ["text"],
+    },
+)
+async def compress_context(input: dict) -> list:
+    return await compress_context_tool(input)
 
 @server.tool(
     name="memory_save",

@@ -1,15 +1,13 @@
 from pathlib import Path
 from typing import List
 
-from mcp import types as mcp_types
 from acc.services.compaction_service import run_compaction
+from mcp import types as mcp_types
 
-async def cli_run_tool(args: mcp_types.ToolInput) -> mcp_types.ToolResult:
-    cmd: List[str] = args.arguments["cmd"]
-    cwd = Path(args.arguments.get("cwd", "."))
+async def cli_run_tool(args: dict) -> list:
+    cmd: List[str] = args.get("cmd", [])
+    cwd = Path(args.get("cwd", "."))
     
     text = run_compaction(cmd, cwd)
 
-    return mcp_types.ToolResult(
-        content=[mcp_types.TextContent(text=text)]
-    )
+    return [mcp_types.TextContent(type="text", text=text)]

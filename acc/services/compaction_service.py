@@ -4,11 +4,9 @@ import shutil
 from pathlib import Path
 from typing import List
 
-from acc.core.config import settings
 from acc.core.logger import log
-from acc.filters.reduction import filter_noise, dedup, truncate
-from acc.compaction.parsers import parse_pytest, parse_git_status, parse_git_log, parse_git_diff
-from acc.compaction.formatter import format_pytest, format_git_status, format_git_log, format_git_diff
+from acc.filters.pipeline import FilterPipeline
+from acc.filters.profile_manager import ProfileManager
 
 def run_compaction(cmd: List[str], cwd: Path | None = None) -> str:
     log.info("Running compaction service", extra={"cmd": cmd, "cwd": str(cwd)})
@@ -28,30 +26,21 @@ def run_compaction(cmd: List[str], cwd: Path | None = None) -> str:
         text=True,
         bufsize=1,
     )
-    raw = []
-    assert proc.stdout is not None
-    for line in proc.stdout:
-        raw.append(line)
+    raw = proc.stdout.read()
     proc.wait()
 
-    filtered = filter_noise(raw)
-    deduped = dedup(filtered, window=settings.dedup_window)
-    compact = truncate(deduped, max_lines=settings.max_lines, raw_lines=raw)
+    pm = ProfileManager()
+    base_cmd = cmd[0].lower()
+    if base_cmd.endswith(".exe"):
+        base_cmd = base_cmd[:-4]
+        
+    profile = pm.load_profile(base_cmd)
+    
+    # Git has subcommands, let's just use the generic git profile for now
+    if "git" in base_cmd:
+        profile = pm.load_profile("git")
 
-    joined_cmd = " ".join(cmd)
-    if joined_cmd.startswith("pytest"):
-        parsed = parse_pytest(compact)
-        text = format_pytest(parsed, compact)
-    elif joined_cmd.startswith("git status"):
-        parsed = parse_git_status(compact)
-        text = format_git_status(parsed, compact)
-    elif joined_cmd.startswith("git log"):
-        parsed = parse_git_log(compact)
-        text = format_git_log(parsed, compact)
-    elif joined_cmd.startswith("git diff"):
-        parsed = parse_git_diff(compact)
-        text = format_git_diff(parsed, compact)
-    else:
-        text = "\n".join(compact)
+    pipeline = FilterPipeline(profile)
+    text = pipeline.execute(raw)
 
     return text
