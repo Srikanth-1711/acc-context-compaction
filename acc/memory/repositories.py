@@ -1,19 +1,19 @@
+from sqlmodel import Session, select
 from acc.memory.models import Container, Memory
-from acc.memory.db import get_session
+from acc.memory.db import engine
 from acc.schemas.memory import Fact
 
 class MemoryRepository:
     def save(self, container_key: str, facts: list[Fact]):
-        with get_session() as session:
-            container = (
-                session.query(Container)
-                .filter(Container.key == container_key)
-                .one_or_none()
-            )
+        with Session(engine) as session:
+            statement = select(Container).where(Container.key == container_key)
+            container = session.exec(statement).first()
             if not container:
                 container = Container(key=container_key, kind="project")
                 session.add(container)
-                session.flush()
+                session.commit()
+                session.refresh(container)
+                
             for f in facts:
                 m = Memory(
                     container_id=container.id,
@@ -28,22 +28,16 @@ class MemoryRepository:
             session.commit()
 
     def search(self, container_key: str, query: str):
-        # Stub for search
-        with get_session() as session:
-            container = (
-                session.query(Container)
-                .filter(Container.key == container_key)
-                .one_or_none()
-            )
+        with Session(engine) as session:
+            statement = select(Container).where(Container.key == container_key)
+            container = session.exec(statement).first()
             if not container:
                 return []
-            memories = (
-                session.query(Memory)
-                .filter(Memory.container_id == container.id)
-                .order_by(Memory.created_at.desc())
-                .limit(50)
-                .all()
-            )
+                
+            # Basic retrieval for now
+            statement = select(Memory).where(Memory.container_id == container.id).order_by(Memory.created_at.desc()).limit(50)
+            memories = session.exec(statement).all()
+            
             return [
                 {
                     "subject": m.subject,

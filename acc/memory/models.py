@@ -1,26 +1,24 @@
 from datetime import datetime
-from sqlalchemy.orm import declarative_base, Mapped, mapped_column
-from sqlalchemy import String, DateTime, Float, ForeignKey
+from typing import Optional
+from sqlmodel import SQLModel, Field, Relationship
 
-Base = declarative_base()
-
-class Container(Base):
+class Container(SQLModel, table=True):
     __tablename__ = "containers"
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    key: Mapped[str] = mapped_column(String, unique=True, index=True)
-    kind: Mapped[str] = mapped_column(String)  # user | project | service
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    id: Optional[int] = Field(default=None, primary_key=True)
+    key: str = Field(unique=True, index=True)
+    kind: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
 
-class Memory(Base):
+class Memory(SQLModel, table=True):
     __tablename__ = "memories"
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    container_id: Mapped[int] = mapped_column(ForeignKey("containers.id"), index=True)
-    subject: Mapped[str] = mapped_column(String, index=True)
-    predicate: Mapped[str] = mapped_column(String)
-    object: Mapped[str] = mapped_column(String)
-    scope: Mapped[str] = mapped_column(String, index=True)
-    kind: Mapped[str] = mapped_column(String)
-    valid_from: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    valid_until: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    confidence: Mapped[float] = mapped_column(Float, default=0.8)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    id: Optional[int] = Field(default=None, primary_key=True)
+    container_id: int = Field(foreign_key="containers.id", index=True)
+    subject: str = Field(index=True)
+    predicate: str
+    object: str
+    scope: str = Field(index=True)
+    kind: str
+    valid_from: Optional[datetime] = Field(default=None)
+    valid_until: Optional[datetime] = Field(default=None)
+    confidence: float = Field(default=0.8)
+    created_at: datetime = Field(default_factory=datetime.utcnow)

@@ -1,0 +1,11 @@
+mcp
+typer
+fastapi
+sqlmodel
+alembic
+pydantic-settings
+httpx
+
+[dev]
+pytest
+pytest-asyncio

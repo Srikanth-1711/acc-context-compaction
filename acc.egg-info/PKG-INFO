@@ -1,0 +1,15 @@
+Metadata-Version: 2.4
+Name: acc
+Version: 0.1.0
+Summary: Automatically Context Compaction framework
+Requires-Python: >=3.10
+Requires-Dist: mcp
+Requires-Dist: typer
+Requires-Dist: fastapi
+Requires-Dist: sqlmodel
+Requires-Dist: alembic
+Requires-Dist: pydantic-settings
+Requires-Dist: httpx
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: pytest-asyncio; extra == "dev"

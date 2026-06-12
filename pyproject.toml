@@ -7,7 +7,8 @@ dependencies = [
     "mcp",
     "typer",
     "fastapi",
-    "sqlalchemy",
+    "sqlmodel",
+    "alembic",
     "pydantic-settings",
     "httpx",
 ]
@@ -21,3 +22,6 @@ dev = [
 [project.scripts]
 acc-mcp = "acc.mcp.server:main"
 acc-proxy = "acc.compaction.proxy:app"
+
+[tool.setuptools.packages.find]
+include = ["acc*"]
