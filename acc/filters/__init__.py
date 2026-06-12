@@ -1,1 +1,1 @@
-# Empty __init__.py
+from acc.filters.pipeline import FilterPipeline
