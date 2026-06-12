@@ -23,7 +23,8 @@ class FilterPipeline:
             text = compress_json(text, max_depth=2)
         elif profile_type == "conversation":
             from acc.structured.conversation import compress_conversation
-            text = compress_conversation(text)
+            backend = self.profile.get("backend", "heuristic")
+            text = compress_conversation(text, backend=backend)
             
         lines = text.split("\n")
         

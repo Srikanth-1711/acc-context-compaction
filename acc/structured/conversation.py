@@ -63,32 +63,8 @@ class ConversationCompressor:
         Stage 3: Semantic Extraction (Pluggable Backend)
         Supported Backends: cloud, local, heuristic
         """
-        state = {
-            "goals": [],
-            "constraints": [],
-            "decisions": [],
-            "current_state": [],
-            "open_tasks": []
-        }
-        
-        # In a real environment:
-        # if self.backend == "cloud":
-        #    return openai.ChatCompletion.create(prompt=..., response_format="json")
-        # elif self.backend == "local":
-        #    return llama.generate(...)
-        
-        # We simulate the fallback heuristic backend which parses explicit tags
-        for line in chunk.split('\n'):
-            if match := re.search(r'(?i)<goal>(.*?)</goal>', line):
-                state["goals"].append(match.group(1).strip())
-            elif match := re.search(r'(?i)DECISION:(.*)', line):
-                state["decisions"].append(match.group(1).strip())
-            elif match := re.search(r'(?i)CONSTRAINT:(.*)', line):
-                state["constraints"].append(match.group(1).strip())
-            elif match := re.search(r'(?i)TODO:(.*)', line):
-                state["open_tasks"].append(match.group(1).strip())
-                
-        return state
+        from acc.core.llm import extract_semantic_state
+        return extract_semantic_state(chunk, self.backend)
 
     def state_merger(self, states: List[Dict[str, List[str]]]) -> Dict[str, List[str]]:
         """
@@ -132,6 +108,6 @@ class ConversationCompressor:
         
         return json.dumps(final_state, indent=2)
 
-def compress_conversation(text: str) -> str:
-    compressor = ConversationCompressor(backend="hybrid")
+def compress_conversation(text: str, backend: str = "heuristic") -> str:
+    compressor = ConversationCompressor(backend=backend)
     return compressor.compress(text)
