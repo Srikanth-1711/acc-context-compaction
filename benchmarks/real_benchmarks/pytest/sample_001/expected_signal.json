@@ -1,0 +1,6 @@
+{
+  "errors": [
+    "FAILED tests/test_critical.py::test_auth - AssertionError: 401 != 200",
+    "FAILED tests/test_db.py::test_connection - sqlalchemy.exc.OperationalError: Connection refused"
+  ]
+}

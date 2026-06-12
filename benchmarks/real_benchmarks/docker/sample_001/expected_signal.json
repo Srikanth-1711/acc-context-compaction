@@ -1,0 +1,6 @@
+{
+  "errors": [
+    "npm ERR! code ERESOLVE",
+    "npm ERR! ERESOLVE unable to resolve dependency tree"
+  ]
+}

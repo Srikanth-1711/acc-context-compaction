@@ -1,0 +1,14 @@
+{
+  "decisions": [
+    "migrate `src/payments.py` to use Stripe v3 API"
+  ],
+  "goals": [
+    "Migrate user table to add stripe_customer_id"
+  ],
+  "constraints": [
+    "Do not drop paypal_id"
+  ],
+  "open_tasks": [
+    "Run `alembic upgrade head` in production"
+  ]
+}

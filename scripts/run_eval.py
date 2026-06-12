@@ -3,7 +3,7 @@ from acc.filters.pipeline import FilterPipeline
 from acc.filters.profile_manager import ProfileManager
 
 if __name__ == "__main__":
-    harness = EvaluationHarness("benchmarks")
+    harness = EvaluationHarness("benchmarks/real_benchmarks")
     pm = ProfileManager()
     
     print("=== ACC Quality Score Evaluation (Phase 3 Profiles) ===")
