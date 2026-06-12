@@ -14,7 +14,22 @@ class MemoryRepository:
                 session.commit()
                 session.refresh(container)
                 
+            from datetime import datetime
+            
             for f in facts:
+                # Check for temporal contradiction
+                existing_stmt = select(Memory).where(
+                    Memory.container_id == container.id,
+                    Memory.subject == f.subject,
+                    Memory.predicate == f.predicate,
+                    Memory.valid_until.is_(None)
+                )
+                existing_mems = session.exec(existing_stmt).all()
+                for old_mem in existing_mems:
+                    if old_mem.object != f.object:
+                        old_mem.valid_until = datetime.utcnow()
+                        session.add(old_mem)
+                
                 m = Memory(
                     container_id=container.id,
                     subject=f.subject,
@@ -22,6 +37,7 @@ class MemoryRepository:
                     object=f.object,
                     scope=f.scope,
                     kind=f.kind,
+                    valid_from=datetime.utcnow(),
                     confidence=f.confidence,
                 )
                 session.add(m)
@@ -34,8 +50,11 @@ class MemoryRepository:
             if not container:
                 return []
                 
-            # Basic retrieval for now
-            statement = select(Memory).where(Memory.container_id == container.id).order_by(Memory.created_at.desc()).limit(50)
+            # Active retrieval
+            statement = select(Memory).where(
+                Memory.container_id == container.id,
+                Memory.valid_until.is_(None)
+            ).order_by(Memory.created_at.desc()).limit(50)
             memories = session.exec(statement).all()
             
             return [
