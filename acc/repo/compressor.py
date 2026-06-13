@@ -20,8 +20,8 @@ def compress_repository(directory: str) -> str:
     ranked = rank_files(graph)
     total_files = len(ranked)
     
-    core_cutoff = max(1, int(total_files * 0.20))
-    peripheral_cutoff = max(1, int(total_files * 0.80))
+    core_cutoff = max(1, int(total_files * 0.05))
+    peripheral_cutoff = max(1, int(total_files * 0.30))
     
     core_files = {r[0] for r in ranked[:core_cutoff]}
     peripheral_files = {r[0] for r in ranked[core_cutoff:peripheral_cutoff]}
@@ -40,31 +40,29 @@ def compress_repository(directory: str) -> str:
         else:
             continue
             
-        try:
-            with open(file_path, "r", encoding="utf-8") as f:
-                code = f.read()
-        except Exception:
-            continue
-            
         output.append(f"\n--- File: {file_path.relative_to(root_path)} (Rank Score: {score}) ---")
         
         if module_name in core_files:
-            # Core: Strip docstrings only, keep bodies
-            compressed = compress_python(code, skeletonize=False, strip_docstrings=True)
-            output.append(compressed)
-        elif module_name in peripheral_files:
-            # Peripheral: Skeletonize (remove bodies and docstrings)
-            compressed = compress_python(code, skeletonize=True, strip_docstrings=True)
-            output.append(compressed)
-        else:
-            # Leaf: Extreme compression (just class/func names, or path only)
-            # For simplicity, we'll aggressively skeletonize
-            compressed = compress_python(code, skeletonize=True, strip_docstrings=True)
-            # Take only the first 10 lines of the skeleton to just show what's inside
-            lines = compressed.split("\n")
-            if len(lines) > 10:
-                output.append("\n".join(lines[:10]) + "\n... (truncated)")
-            else:
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    code = f.read()
+                # Core: Skeletonize (remove bodies), but keep docstrings
+                compressed = compress_python(code, skeletonize=True, strip_docstrings=False)
                 output.append(compressed)
+            except Exception:
+                continue
+        elif module_name in peripheral_files:
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    code = f.read()
+                # Peripheral: Skeletonize AND strip docstrings
+                compressed = compress_python(code, skeletonize=True, strip_docstrings=True)
+                output.append(compressed)
+            except Exception:
+                continue
+        else:
+            # Leaf: Extreme compression (Path only, zero AST parsing)
+            # We already printed the filename above. Do not read or append the code.
+            pass
                 
     return "\n".join(output)
