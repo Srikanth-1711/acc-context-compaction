@@ -26,8 +26,9 @@ dev = [
 ]
 
 [project.scripts]
-acc-mcp = "acc.cli.main:main"
+acc-mcp = "acc.mcp.server:main"
 acc-proxy = "acc.cli.proxy:main"
+acc-hooks = "acc.cli.hooks_cmd:main"
 
 [tool.setuptools.packages.find]
 include = ["acc*"]
