@@ -1,3 +1,4 @@
 [console_scripts]
+acc-hooks = acc.cli.hooks_cmd:main
 acc-mcp = acc.mcp.server:main
 acc-proxy = acc.cli.proxy:main

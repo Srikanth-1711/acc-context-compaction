@@ -4,6 +4,7 @@ acc/__init__.py
 acc/api/__init__.py
 acc/api/routes.py
 acc/cli/__init__.py
+acc/cli/hooks_cmd.py
 acc/cli/install_hooks.py
 acc/cli/proxy.py
 acc/compaction/__init__.py
