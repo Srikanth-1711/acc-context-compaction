@@ -1,0 +1,3 @@
+[console_scripts]
+acc-mcp = acc.mcp.server:main
+acc-proxy = acc.cli.proxy:main

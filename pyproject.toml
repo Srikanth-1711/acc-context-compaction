@@ -1,5 +1,5 @@
 [project]
-name = "acc"
+name = "acc-context-compaction"
 version = "0.1.0"
 description = "Automatically Context Compaction framework"
 requires-python = ">=3.10"
@@ -27,7 +27,7 @@ dev = [
 
 [project.scripts]
 acc-mcp = "acc.mcp.server:main"
-acc-proxy = "acc.compaction.proxy:app"
+acc-proxy = "acc.cli.proxy:main"
 
 [tool.setuptools.packages.find]
 include = ["acc*"]

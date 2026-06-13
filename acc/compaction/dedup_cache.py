@@ -34,24 +34,48 @@ class DedupCache:
     """
 
     def __init__(self):
-        self._cache: dict[Fingerprint, int] = {}  # fingerprint → turn number
+        import tempfile
+        import os
+        from pathlib import Path
+        self._cache_file = Path(tempfile.gettempdir()) / "acc_dedup_cache.json"
+        self._cache: dict[Fingerprint, int] = {}
         self._turn: int = 0
+        self._load()
+
+    def _load(self):
+        import json
+        if self._cache_file.exists():
+            try:
+                data = json.loads(self._cache_file.read_text(encoding="utf-8"))
+                self._turn = data.get("turn", 0)
+                for k, v in data.get("cache", {}).items():
+                    parts = k.split(":")
+                    if len(parts) == 3:
+                        fp = Fingerprint(int(parts[0]), int(parts[1]), int(parts[2]))
+                        self._cache[fp] = v
+            except Exception:
+                pass
+
+    def _save(self):
+        import json
+        try:
+            data = {
+                "turn": self._turn,
+                "cache": {f"{fp.byte_length}:{fp.prefix_hash}:{fp.suffix_hash}": v for fp, v in self._cache.items()}
+            }
+            self._cache_file.write_text(json.dumps(data), encoding="utf-8")
+        except Exception:
+            pass
 
     def next_turn(self):
-        """Increment turn counter. Call at the start of each tool invocation."""
         self._turn += 1
+        self._save()
 
     @property
     def current_turn(self) -> int:
         return self._turn
 
     def check(self, raw: str) -> Optional[str]:
-        """
-        Check if this output was seen before in this session.
-
-        Returns a suppression message if output was seen before, None otherwise.
-        On first seeing an output, it is fingerprinted and cached.
-        """
         if not raw or not raw.strip():
             return None
 
@@ -63,17 +87,10 @@ class DedupCache:
                 f"suppressed ({fp.byte_length:,} bytes)]"
             )
         self._cache[fp] = self._turn
+        self._save()
         return None
 
     def check_file(self, file_path: str, size: int, mtime_ns: int) -> Optional[str]:
-        """
-        Check if a file has been read before based on stat metadata.
-        O(1) — does not require reading the file contents.
-
-        Returns a suppression message if the file was read with
-        identical size and mtime, None otherwise.
-        """
-        # Use a synthetic fingerprint from file metadata
         fp = Fingerprint(
             byte_length=size,
             prefix_hash=hash(file_path),
@@ -86,24 +103,26 @@ class DedupCache:
                 f"suppressed ({size:,} bytes)]"
             )
         self._cache[fp] = self._turn
+        self._save()
         return None
 
     def _fingerprint(self, text: str) -> Fingerprint:
-        """Create an O(1) fingerprint from text content."""
+        import hashlib
+        def dhash(s: str) -> int:
+            return int(hashlib.md5(s.encode('utf-8')).hexdigest()[:16], 16)
         return Fingerprint(
             byte_length=len(text),
-            prefix_hash=hash(text[:256]),
-            suffix_hash=hash(text[-256:]) if len(text) > 256 else hash(text),
+            prefix_hash=dhash(text[:256]),
+            suffix_hash=dhash(text[-256:]) if len(text) > 256 else dhash(text),
         )
 
     def clear(self):
-        """Reset the cache. Called on session end."""
         self._cache.clear()
         self._turn = 0
+        self._save()
 
     @property
     def size(self) -> int:
-        """Number of entries in the cache."""
         return len(self._cache)
 
 
