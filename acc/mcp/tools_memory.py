@@ -3,9 +3,9 @@ from mcp import types as mcp_types
 from acc.services.memory_service import save_memory, search_memory
 from acc.schemas.memory import MemoryCreate, MemorySearch, Fact
 
-async def memory_save_tool(args: mcp_types.ToolInput) -> mcp_types.ToolResult:
-    container_key = args.arguments["container_key"]
-    facts_raw = args.arguments["facts"]
+async def memory_save_tool(args: dict) -> list:
+    container_key = args["container_key"]
+    facts_raw = args["facts"]
     
     facts = []
     for f in facts_raw:
@@ -16,16 +16,14 @@ async def memory_save_tool(args: mcp_types.ToolInput) -> mcp_types.ToolResult:
             scope=f.get("scope", "")
         ))
         
-    req = MemoryCreate(container_key=container_key, facts=facts)
-    save_memory(req)
+    memory_in = MemoryCreate(container_key=container_key, facts=facts)
+    save_memory(memory_in)
     
-    return mcp_types.ToolResult(
-        content=[mcp_types.TextContent(text="Facts saved successfully.")]
-    )
+    return [mcp_types.TextContent(type="text", text=f"Saved {len(facts)} facts to memory.")]
 
-async def memory_search_tool(args: mcp_types.ToolInput) -> mcp_types.ToolResult:
-    container_key = args.arguments["container_key"]
-    query = args.arguments["query"]
+async def memory_search_tool(args: dict) -> list:
+    container_key = args["container_key"]
+    query = args["query"]
     
     req = MemorySearch(container_key=container_key, query=query)
     results = search_memory(req)

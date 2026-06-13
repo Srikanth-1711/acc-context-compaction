@@ -34,9 +34,11 @@ class FilterPipeline:
         # 2. Dedup
         lines = dedup(lines)
         
-        # 3. Noise Removal (use custom patterns if provided)
+        # 3. Noise Removal
         noise_patterns = self.profile.get("noise_patterns", None)
-        lines = remove_noise(lines, custom_patterns=noise_patterns)
+        important_patterns = self.profile.get("important_patterns", None)
+        lines = remove_noise(lines, custom_patterns=noise_patterns, 
+                             important_patterns=important_patterns)
         
         # 4. Head/Tail
         max_lines = self.profile.get("max_lines", 2000)

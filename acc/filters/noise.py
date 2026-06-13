@@ -12,7 +12,8 @@ DEFAULT_NOISE_PREFIXES = [
     "extracting"
 ]
 
-def remove_noise(lines: List[str], custom_patterns: List[str] = None) -> List[str]:
+def remove_noise(lines: List[str], custom_patterns: List[str] = None, 
+                 important_patterns: List[str] = None) -> List[str]:
     """
     Strips universally useless lines, plus any custom noise patterns provided.
     """
@@ -23,6 +24,13 @@ def remove_noise(lines: List[str], custom_patterns: List[str] = None) -> List[st
         stripped = line.strip()
         if not stripped:
             continue
+            
+        # Important patterns override noise removal
+        if important_patterns:
+            is_important = any(p.lower() in stripped.lower() for p in important_patterns)
+            if is_important:
+                out.append(line)
+                continue
         
         is_noise = False
         lower_line = stripped.lower()

@@ -13,10 +13,13 @@ dependencies = [
     "httpx",
     "tiktoken",
     "pyyaml",
-    "astor",
 ]
 
 [project.optional-dependencies]
+slicer = [
+    "tree-sitter==0.21.3",
+    "tree-sitter-languages>=1.10",
+]
 dev = [
     "pytest",
     "pytest-asyncio",

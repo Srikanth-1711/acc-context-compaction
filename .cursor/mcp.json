@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "acc-server": {
+      "command": "python",
+      "args": ["-m", "acc_mcp.server"]
+    }
+  }
+}

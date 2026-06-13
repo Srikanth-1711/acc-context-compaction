@@ -1,5 +1,4 @@
 import ast
-import astor
 
 class Skeletonizer(ast.NodeTransformer):
     def __init__(self, strip_docstrings=True):
@@ -61,4 +60,4 @@ def compress_python(code: str, skeletonize: bool = True, strip_docstrings: bool 
             pass # TODO: implement docstring-only strip if needed
         ast.fix_missing_locations(tree)
         
-    return astor.to_source(tree)
+    return ast.unparse(tree)

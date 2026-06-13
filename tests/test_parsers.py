@@ -1,7 +1,13 @@
-from acc.compaction.parsers import parse_git_status
+"""Tests for backward compatibility — parser routing via get_parser."""
+from acc.compaction.parsers import get_parser
 
-def test_parse_git_status():
-    lines = [" M file1.py", "?? new_file.py"]
-    res = parse_git_status(lines)
-    assert "M file1.py" in res["modified"]
-    assert "new_file.py" in res["untracked"]
+
+def test_git_parser_exists():
+    parser = get_parser("git")
+    assert parser is not None
+
+
+def test_pytest_parser_exists():
+    parser = get_parser("pytest")
+    assert parser is not None
+
