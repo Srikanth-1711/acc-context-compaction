@@ -109,21 +109,7 @@ async def handle_call_tool(name: str, arguments: dict | None) -> list[mcp_types.
     else:
         raise ValueError(f"Unknown tool: {name}")
 
-def main():
-    import sys
-    if "--install-hooks" in sys.argv:
-        from acc.cli.install_hooks import install
-        install()
-        sys.exit(0)
-    if "--uninstall-hooks" in sys.argv:
-        from acc.cli.install_hooks import uninstall
-        uninstall()
-        sys.exit(0)
-    if "--help" in sys.argv:
-        print("ACC Context Compaction MCP Server")
-        print("Usage: acc-mcp [options]")
-        sys.exit(0)
-
+def run():
     from mcp.server.stdio import stdio_server
     
     async def _run():
@@ -133,4 +119,4 @@ def main():
     asyncio.run(_run())
 
 if __name__ == "__main__":
-    main()
+    run()

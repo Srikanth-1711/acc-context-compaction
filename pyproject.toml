@@ -26,7 +26,7 @@ dev = [
 ]
 
 [project.scripts]
-acc-mcp = "acc.mcp.server:main"
+acc-mcp = "acc.cli.main:main"
 acc-proxy = "acc.cli.proxy:main"
 
 [tool.setuptools.packages.find]

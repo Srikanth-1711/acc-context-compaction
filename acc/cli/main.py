@@ -15,7 +15,7 @@ def main():
         print("ACC Context Compaction MCP Server")
         print("Usage: acc-mcp [options]")
         sys.exit(0)
-
+    
     # Only AFTER checking flags, start MCP server
     from acc.mcp.server import run
     run()
