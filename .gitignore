@@ -1,0 +1,13 @@
+build/
+dist/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+acc_memory.db
+*.spec
+!acc-mcp.spec
+test.js
+benchmarks/temp_bench.py
+.cursor/
