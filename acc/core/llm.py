@@ -23,11 +23,19 @@ def extract_semantic_state(chunk: str, backend: str) -> dict:
     has_task = "TODO: Run `alembic upgrade head` in production." in chunk or "TODO: Run tests." in chunk
     
     if backend == "heuristic":
-        # Heuristics are rigid and miss implicit or slightly-off-format items
-        # It catches <goal> and explicit TODOs, but might miss decisions if spacing/casing is off.
-        if has_goal: base_state["goals"].append("Migrate user table to add stripe_customer_id")
-        if has_task: base_state["open_tasks"].append("Run `alembic upgrade head` in production.")
-        # Fails to extract decisions or constraints properly due to regex brittleness
+        import re
+        # Extract goals from <goal>...</goal> tags
+        for m in re.finditer(r'<goal>(.*?)</goal>', chunk, re.DOTALL):
+            base_state["goals"].append(m.group(1).strip())
+        # Extract decisions from ### DECISION: or DECISION: lines
+        for m in re.finditer(r'(?:###\s*)?DECISION:\s*(.+)', chunk):
+            base_state["decisions"].append(m.group(1).strip())
+        # Extract constraints from Constraint: lines
+        for m in re.finditer(r'Constraint(?:\s+added)?:\s*(.+)', chunk):
+            base_state["constraints"].append(m.group(1).strip())
+        # Extract TODOs from TODO: lines
+        for m in re.finditer(r'TODO:\s*(.+)', chunk):
+            base_state["open_tasks"].append(m.group(1).strip())
         return base_state
         
     elif backend == "cloud-gpt4o-mini":

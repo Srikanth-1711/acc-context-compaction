@@ -7,6 +7,7 @@ pydantic-settings
 httpx
 tiktoken
 pyyaml
+tomli
 
 [dev]
 pytest

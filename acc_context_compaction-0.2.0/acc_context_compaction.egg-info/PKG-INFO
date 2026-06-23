@@ -12,7 +12,6 @@ Requires-Dist: pydantic-settings
 Requires-Dist: httpx
 Requires-Dist: tiktoken
 Requires-Dist: pyyaml
-Requires-Dist: tomli
 Provides-Extra: slicer
 Requires-Dist: tree-sitter==0.21.3; extra == "slicer"
 Requires-Dist: tree-sitter-languages>=1.10; extra == "slicer"

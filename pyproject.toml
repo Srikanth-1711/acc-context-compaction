@@ -1,6 +1,6 @@
 [project]
 name = "acc-context-compaction"
-version = "0.1.2"
+version = "0.2.0"
 description = "Automatically Context Compaction framework"
 requires-python = ">=3.10"
 dependencies = [
@@ -13,6 +13,7 @@ dependencies = [
     "httpx",
     "tiktoken",
     "pyyaml",
+    "tomli",
 ]
 
 [project.optional-dependencies]
@@ -30,5 +31,37 @@ acc-mcp = "acc.mcp.server:main"
 acc-proxy = "acc.cli.proxy:main"
 acc-hooks = "acc.cli.hooks_cmd:main"
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=acc --cov-report=term-missing --cov-fail-under=80"
+
 [tool.setuptools.packages.find]
 include = ["acc*"]
+
+[tool.coverage.run]
+source = ["acc"]
+omit = [
+    "acc/api/*",
+    "acc/cli/*",
+    "acc/compaction/_formatter_deprecated.py",
+    "acc/compaction/_parsers_deprecated.py",
+    "acc/compaction/proxy.py",
+    "acc/compaction/slicer.py",
+    "acc/compaction/parsers/*",  # ALL parser files are legacy
+    "acc/core/*",
+    "acc/mcp/*",
+    "acc/schemas/*",
+    "acc/structured/*",
+    "acc/telemetry/models.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]

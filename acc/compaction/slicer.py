@@ -15,58 +15,10 @@ from pathlib import Path
 from typing import Optional
 
 from acc.compaction.dedup_cache import get_session_cache
-
-# Language detection from file extension
-EXTENSION_MAP = {
-    ".py": "python",
-    ".js": "javascript",
-    ".jsx": "javascript",
-    ".ts": "typescript",
-    ".tsx": "typescript",
-    ".c": "c",
-    ".h": "c",
-    ".cpp": "cpp",
-    ".hpp": "cpp",
-    ".cc": "cpp",
-    ".cxx": "cpp",
-    ".rs": "rust",
-    ".go": "go",
-    ".java": "java",
-}
-
-# tree-sitter node types for function/class extraction by language
-_TS_FUNC_TYPES = {
-    "python": ["function_definition", "class_definition"],
-    "javascript": ["function_declaration", "class_declaration", "method_definition",
-                   "arrow_function", "function"],
-    "typescript": ["function_declaration", "class_declaration", "method_definition",
-                   "arrow_function", "function"],
-    "c": ["function_definition", "struct_specifier", "enum_specifier"],
-    "cpp": ["function_definition", "class_specifier", "struct_specifier"],
-    "rust": ["function_item", "struct_item", "enum_item", "impl_item"],
-    "go": ["function_declaration", "method_declaration", "type_declaration"],
-    "java": ["method_declaration", "class_declaration", "interface_declaration"],
-}
-
-_TS_IMPORT_TYPES = {
-    "python": ["import_statement", "import_from_statement"],
-    "javascript": ["import_statement"],
-    "typescript": ["import_statement"],
-    "c": ["preproc_include"],
-    "cpp": ["preproc_include", "using_declaration"],
-    "rust": ["use_declaration"],
-    "go": ["import_declaration"],
-    "java": ["import_declaration"],
-}
-
-
-def _has_treesitter() -> bool:
-    """Check if tree-sitter-languages is installed."""
-    try:
-        import tree_sitter_languages  # noqa: F401
-        return True
-    except ImportError:
-        return False
+from acc.repo.treesitter_utils import (
+    has_treesitter, get_language, ts_extract_name, 
+    TS_FUNC_TYPES, TS_IMPORT_TYPES
+)
 
 
 def slice_file(file_path: str, focus_function: Optional[str] = None) -> str:
@@ -97,8 +49,7 @@ def slice_file(file_path: str, focus_function: Optional[str] = None) -> str:
     except OSError:
         pass  # Can't stat — proceed with read
 
-    ext = Path(file_path).suffix.lower()
-    lang = EXTENSION_MAP.get(ext)
+    lang = get_language(file_path)
 
     if lang is None:
         return _raw_truncated(file_path)
@@ -115,7 +66,7 @@ def slice_file(file_path: str, focus_function: Optional[str] = None) -> str:
         return _slice_python(file_path, source, line_count, focus_function)
 
     # Try tree-sitter for non-Python languages
-    if _has_treesitter():
+    if has_treesitter():
         try:
             return _slice_treesitter(
                 file_path, source, lang, line_count, focus_function
@@ -214,8 +165,8 @@ def _slice_treesitter(
     functions = []
     constants = []
 
-    import_types = set(_TS_IMPORT_TYPES.get(lang, []))
-    func_types = set(_TS_FUNC_TYPES.get(lang, []))
+    import_types = set(TS_IMPORT_TYPES.get(lang, []))
+    func_types = set(TS_FUNC_TYPES.get(lang, []))
 
     def _walk(node):
         if node.type in import_types:
@@ -226,7 +177,7 @@ def _slice_treesitter(
             imports.append(text)
 
         elif node.type in func_types:
-            name = _ts_extract_name(node, source)
+            name = ts_extract_name(node, source)
             start_line = node.start_point[0] + 1
             end_line = node.end_point[0] + 1
 
@@ -247,16 +198,6 @@ def _slice_treesitter(
         functions, constants, focus_function, lines,
     )
 
-
-def _ts_extract_name(node, source: str) -> str:
-    """Extract the name identifier from a tree-sitter node."""
-    for child in node.children:
-        if child.type in ("identifier", "name", "type_identifier", "field_identifier"):
-            return source[child.start_byte:child.end_byte]
-    # Fallback: return first meaningful text
-    text = source[node.start_byte:node.end_byte]
-    first_line = text.split("\n")[0].strip()
-    return first_line[:60] if len(first_line) > 60 else first_line
 
 
 def _format_index(
