@@ -4,7 +4,10 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, List
 from sqlmodel import create_engine, Session, SQLModel, select, func
 
+import logging
 from acc.telemetry.models import RunLog
+
+logger = logging.getLogger("acc.telemetry")
 
 def get_engine():
     db_path = Path.home() / ".acc" / "acc_telemetry.db"
@@ -44,9 +47,9 @@ class AnalyticsTracker:
                 )
                 session.add(log)
                 session.commit()
-        except Exception:
+        except Exception as e:
             # Swallow telemetry errors to avoid breaking the core flow
-            pass
+            logger.error(f"Telemetry logging failed: {e}")
 
     def get_json(self, period: str = "all") -> Dict[str, Any]:
         """Get JSON analytics for a period (day, week, month, all)."""
@@ -88,7 +91,8 @@ class AnalyticsTracker:
                     "reduction_pct": round(pct, 2),
                     "memories_used": total_memories or 0
                 }
-        except Exception:
+        except Exception as e:
+            logger.error(f"Analytics fetch failed: {e}")
             return {"error": "Failed to fetch analytics"}
 
     def get_markdown_report(self) -> str:

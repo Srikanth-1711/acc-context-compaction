@@ -27,9 +27,10 @@ dev = [
 ]
 
 [project.scripts]
-acc-mcp = "acc.mcp.server:main"
+acc-mcp = "acc.mcp_server:main"
 acc-proxy = "acc.cli.proxy:main"
 acc-hooks = "acc.cli.hooks_cmd:main"
+acc = "acc.cli:app"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

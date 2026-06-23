@@ -2,6 +2,9 @@ import hashlib
 import json
 import tempfile
 import os
+import logging
+
+logger = logging.getLogger("acc.dedup")
 
 class DedupCache:
     def __init__(self, session_id: str):
@@ -18,7 +21,8 @@ class DedupCache:
                     data = json.load(f)
                     self.fingerprints = data.get('fingerprints', {})
                     self.turn = data.get('turn', 0)
-            except (json.JSONDecodeError, OSError):
+            except (json.JSONDecodeError, OSError) as e:
+                logger.error(f"Failed to load dedup cache from {self.file_path}: {e}")
                 self.fingerprints = {}
                 self.turn = 0
 
@@ -26,8 +30,8 @@ class DedupCache:
         try:
             with open(self.file_path, 'w', encoding='utf-8') as f:
                 json.dump({'fingerprints': self.fingerprints, 'turn': self.turn}, f)
-        except OSError:
-            pass
+        except OSError as e:
+            logger.error(f"Failed to save dedup cache to {self.file_path}: {e}")
 
     def _fingerprint(self, text: str) -> str:
         """Triple hash fingerprint: (length, md5(first256), md5(last256))"""

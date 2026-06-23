@@ -1,7 +1,10 @@
 import re
 import os
 import tempfile
+import logging
 from typing import List, Dict, Any, Optional
+
+logger = logging.getLogger("acc.pipeline")
 
 class FilterPipeline:
     def __init__(self, filter_config: Dict[str, Any] = None):
@@ -75,7 +78,8 @@ class FilterPipeline:
         try:
             regex = re.compile(pattern)
             return [regex.sub(repl, line) for line in lines]
-        except re.error:
+        except re.error as e:
+            logger.warning(f"Invalid regex pattern in replace: {pattern} - {e}")
             return lines
 
     def _regex_drop(self, lines: List[str], stage: Dict[str, Any]) -> List[str]:
@@ -85,7 +89,8 @@ class FilterPipeline:
         try:
             regex = re.compile(pattern)
             return [line for line in lines if not regex.search(line)]
-        except re.error:
+        except re.error as e:
+            logger.warning(f"Invalid regex pattern in drop: {pattern} - {e}")
             return lines
 
     def _regex_keep(self, lines: List[str], stage: Dict[str, Any]) -> List[str]:
@@ -95,7 +100,8 @@ class FilterPipeline:
         try:
             regex = re.compile(pattern)
             return [line for line in lines if regex.search(line)]
-        except re.error:
+        except re.error as e:
+            logger.warning(f"Invalid regex pattern in keep: {pattern} - {e}")
             return lines
 
     def _line_dedup(self, lines: List[str]) -> List[str]:
@@ -119,8 +125,8 @@ class FilterPipeline:
         if priority_pattern:
             try:
                 priority_regex = re.compile(priority_pattern)
-            except re.error:
-                pass
+            except re.error as e:
+                logger.warning(f"Invalid regex pattern in smart_truncate priority_lines: {priority_pattern} - {e}")
                 
         head_count = int(max_lines * head_ratio)
         tail_count = max_lines - head_count
