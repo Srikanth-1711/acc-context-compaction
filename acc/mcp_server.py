@@ -6,6 +6,7 @@ from acc.compaction.pipeline import FilterPipeline
 from acc.compaction.dedup import get_session_cache
 from acc.memory.retrieval import MemoryRetriever
 from acc.compression.deterministic import DeterministicCompressor
+from acc.compression.irc import InlineReversibleCompressor
 from acc.compaction.executor import execute_command
 from acc.telemetry.tracker import AnalyticsTracker
 from sqlmodel import Session
@@ -42,9 +43,7 @@ def acc_run(
     context: Optional[dict] = None,
     session_id: Optional[str] = None
 ) -> dict:
-    """
-    The unified context optimizer for running shell commands.
-    """
+    """Run a shell command with context optimization via IRC."""
     if session_id is None:
         session_id = context.get("session_id", "default") if context else "default"
         
@@ -90,9 +89,12 @@ def acc_run(
     pipeline = FilterPipeline.for_command(command)
     filtered = pipeline.run(raw_output)
     
-    # 5. COMPRESS: Deterministic fallback
+    # 5. COMPRESS: Deterministic fallback + Inline Reversible Compression
     compressor = DeterministicCompressor()
-    compressed = compressor.run(filtered)
+    drop_indices = compressor.get_drop_indices(filtered)
+    
+    irc = InlineReversibleCompressor()
+    compressed = irc.compress(filtered, drop_indices)
     
     # 6. TRACK: Log savings
     tracker.log_run(
@@ -112,6 +114,12 @@ def acc_run(
         "truncated": pipeline.was_truncated,
         "full_output_path": pipeline.tee_path if pipeline.was_truncated else None
     }
+
+@mcp.tool()
+def acc_expand(compressed_text: str) -> str:
+    """Expand inline-compressed context back to full text."""
+    irc = InlineReversibleCompressor()
+    return irc.expand(compressed_text)
 
 @mcp.tool()
 def acc_remember(facts: List[dict]) -> dict:
@@ -161,7 +169,7 @@ def get_status() -> dict:
     """Health check for ACC MCP server."""
     return {
         "status": "healthy",
-        "telemetry_db": str(tracker.engine.url)
+        "telemetry": "active"
     }
 
 def main():

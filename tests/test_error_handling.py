@@ -57,14 +57,9 @@ def test_dedup_save_error_logs_but_does_not_crash(tmp_path, monkeypatch, caplog)
     
     cache = DedupCache("test_session")
     
-    import builtins
-    original_open = builtins.open
-    def mock_open(file, mode='r', **kwargs):
-        if mode == 'w':
-            raise OSError("Disk full")
-        return original_open(file, mode, **kwargs)
-        
-    monkeypatch.setattr(builtins, "open", mock_open)
+    def mock_replace(*args, **kwargs):
+        raise OSError("Mock save error")
+    monkeypatch.setattr("os.replace", mock_replace)
     
     cache.check("test text")
     assert "Failed to save dedup cache" in caplog.text

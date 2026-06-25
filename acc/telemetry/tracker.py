@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, List
 from sqlmodel import create_engine, Session, SQLModel, select, func
 
@@ -53,7 +53,7 @@ class AnalyticsTracker:
 
     def get_json(self, period: str = "all") -> Dict[str, Any]:
         """Get JSON analytics for a period (day, week, month, all)."""
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         if period == "day":
             start_date = now - timedelta(days=1)
         elif period == "week":

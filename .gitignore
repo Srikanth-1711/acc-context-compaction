@@ -1,13 +1,27 @@
+# Build artifacts
 build/
 dist/
+*.egg-info/
+
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .env
-acc_memory.db
-*.spec
-!acc-mcp.spec
-test.js
-benchmarks/temp_bench.py
+
+# Database files
+*.db
+*.sqlite
+
+# Coverage
+.coverage
+htmlcov/
+coverage.xml
+
+# IDE
 .cursor/
+.pytest_cache/
+
+# Temp
+benchmarks/temp_bench.py

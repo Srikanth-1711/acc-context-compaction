@@ -2,7 +2,7 @@ import pytest
 import tempfile
 import os
 import builtins
-from acc.mcp_server import acc_run
+from acc.mcp_server import acc_run, acc_expand, get_status, get_analytics, count_tokens
 
 def test_acc_run_session_fallback(monkeypatch):
     import acc.mcp_server as mcp_server
@@ -75,4 +75,56 @@ def test_acc_run_errors(monkeypatch):
     monkeypatch.setattr(mcp_server, "execute_command", mock_exec)
     
     res = acc_run("cmd")
-    assert "mock error" in res["output"] # The error might be part of output
+    assert "mock error" in res["output"]
+
+
+def test_acc_expand_roundtrip():
+    """Test acc_expand MCP tool with a real IRC token."""
+    from acc.compression.irc import InlineReversibleCompressor
+    irc = InlineReversibleCompressor()
+    text = "Line A\nLine B\nLine C\nLine D"
+    compressed = irc.compress(text, [1, 3])
+    
+    expanded = acc_expand(compressed)
+    assert expanded == text
+
+
+def test_acc_expand_no_token():
+    """Test acc_expand with text that has no IRC token."""
+    result = acc_expand("just plain text")
+    assert result == "just plain text"
+
+
+def test_get_status():
+    """Test the health check resource."""
+    status = get_status()
+    assert status["status"] == "healthy"
+    assert status["telemetry"] == "active"
+    assert "telemetry_db" not in status  # Security: no DB URL exposed
+
+
+def test_get_analytics():
+    """Test the analytics resource returns markdown."""
+    result = get_analytics()
+    assert "ACC Telemetry" in result or "Period" in result
+
+
+def test_count_tokens_empty():
+    """Test token counting with empty string."""
+    assert count_tokens("") == 0
+
+
+def test_count_tokens_nonempty():
+    """Test token counting with actual text."""
+    result = count_tokens("hello world")
+    assert result > 0
+
+
+def test_count_tokens_fallback(monkeypatch):
+    """Test token counting fallback when tiktoken is None."""
+    import acc.mcp_server as mcp_server
+    original_encoder = mcp_server._encoder
+    monkeypatch.setattr(mcp_server, "_encoder", None)
+    result = count_tokens("hello world this is a test")
+    assert result > 0  # Should use len//4 fallback
+    monkeypatch.setattr(mcp_server, "_encoder", original_encoder)

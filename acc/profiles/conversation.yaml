@@ -1,4 +1,0 @@
-name: conversation
-type: conversation
-max_lines: 50000
-head_ratio: 0.5

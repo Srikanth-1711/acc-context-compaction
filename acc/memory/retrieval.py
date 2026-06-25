@@ -1,5 +1,5 @@
 from typing import List, Tuple, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlmodel import Session, select, func
 from acc.memory.models import MemoryFact
 
@@ -17,7 +17,7 @@ class MemoryRetriever:
         )
         existing_facts = self.session.exec(statement).all()
         
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         for fact in existing_facts:
             if fact.object != object_value:
                 # Contradiction detected, deprecate the old fact
@@ -62,7 +62,7 @@ class MemoryRetriever:
     
     def temporal_query(self, subject: str, at_time: Optional[datetime] = None) -> List[MemoryFact]:
         """Query active facts for a subject at a given time."""
-        at_time = at_time or datetime.utcnow()
+        at_time = at_time or datetime.now(timezone.utc)
         statement = select(MemoryFact).where(
             MemoryFact.subject == subject,
             MemoryFact.valid_from <= at_time,

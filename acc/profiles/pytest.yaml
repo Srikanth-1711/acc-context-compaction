@@ -1,9 +1,0 @@
-name: pytest
-max_lines: 500
-head_ratio: 0.1
-noise_patterns:
-  - "collected "
-  - "PASSED "
-important_patterns:
-  - "FAILURES"
-  - "AssertionError"

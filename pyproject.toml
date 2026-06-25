@@ -1,35 +1,26 @@
 [project]
 name = "acc-context-compaction"
-version = "0.2.0"
-description = "Automatically Context Compaction framework"
+version = "0.3.0"
+description = "ACC — Inline Reversible Compression for AI Agents"
 requires-python = ">=3.10"
+license = {text = "MIT"}
 dependencies = [
     "mcp",
     "typer",
-    "fastapi",
     "sqlmodel",
-    "alembic",
-    "pydantic-settings",
-    "httpx",
     "tiktoken",
-    "pyyaml",
     "tomli",
 ]
 
 [project.optional-dependencies]
-slicer = [
-    "tree-sitter==0.21.3",
-    "tree-sitter-languages>=1.10",
-]
 dev = [
     "pytest",
     "pytest-asyncio",
+    "pytest-cov",
 ]
 
 [project.scripts]
 acc-mcp = "acc.mcp_server:main"
-acc-proxy = "acc.cli.proxy:main"
-acc-hooks = "acc.cli.hooks_cmd:main"
 acc = "acc.cli:app"
 
 [tool.pytest.ini_options]
@@ -41,20 +32,6 @@ include = ["acc*"]
 
 [tool.coverage.run]
 source = ["acc"]
-omit = [
-    "acc/api/*",
-    "acc/cli/*",
-    "acc/compaction/_formatter_deprecated.py",
-    "acc/compaction/_parsers_deprecated.py",
-    "acc/compaction/proxy.py",
-    "acc/compaction/slicer.py",
-    "acc/compaction/parsers/*",  # ALL parser files are legacy
-    "acc/core/*",
-    "acc/mcp/*",
-    "acc/schemas/*",
-    "acc/structured/*",
-    "acc/telemetry/models.py",
-]
 
 [tool.coverage.report]
 exclude_lines = [
@@ -62,7 +39,7 @@ exclude_lines = [
     "def __repr__",
     "raise AssertionError",
     "raise NotImplementedError",
-    "if __name__ == .__main__.:",
+    "if __name__ == .__main__.",
     "class .*\\bProtocol\\):",
     "@(abc\\.)?abstractmethod",
 ]

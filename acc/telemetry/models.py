@@ -1,10 +1,13 @@
 from typing import Optional
 from sqlmodel import SQLModel, Field
-from datetime import datetime
+from datetime import datetime, timezone
+
+def _utc_now() -> datetime:
+    return datetime.now(timezone.utc)
 
 class RunLog(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=_utc_now)
     command: str
     raw_tokens: int
     output_tokens: int
@@ -13,3 +16,4 @@ class RunLog(SQLModel, table=True):
     session_id: Optional[str] = None
     memories_used: int = 0
     latency_ms: Optional[int] = None
+
