@@ -5,7 +5,7 @@
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Coverage](https://img.shields.io/badge/coverage-80%25+-brightgreen.svg)]()
+[![Coverage](https://img.shields.io/badge/coverage-89%25+-brightgreen.svg)]()
 
 ## The Problem
 
